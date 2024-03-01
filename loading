@@ -1,0 +1,54 @@
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local SoundService = game:GetService("SoundService")
+
+local IntroHit = SoundService:WaitForChild("UISounds"):WaitForChild("IntroHit")
+
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer.PlayerGui
+
+local LoadingScreen: ScreenGui = script.LoadingScreen:Clone()
+local LoadingText: TextLabel = LoadingScreen:WaitForChild("Frame"):WaitForChild("Loading")
+LoadingScreen.Parent = PlayerGui
+
+
+ReplicatedFirst:RemoveDefaultLoadingScreen()
+
+local function loadloadload()
+	while true do
+		task.wait(0.01)
+		LoadingText.Text = LoadingText.Text.." loading"
+	end
+end
+
+local newthread = coroutine.create(loadloadload)
+coroutine.resume(newthread)
+
+task.wait(4)
+if (not game:IsLoaded()) then
+	game.Loaded:Wait();
+end
+
+
+LoadingText.TextXAlignment = Enum.TextXAlignment.Center
+IntroHit:Play()
+task.wait(0.4)
+coroutine.close(newthread)
+LoadingText.Text = "supertree presents"
+
+
+
+task.wait(2)
+
+local fadeoff = TweenService:Create(
+	LoadingText, 
+	TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.In),
+	{["TextTransparency"] = 1}
+)
+
+fadeoff:Play()
+fadeoff.Completed:Wait()
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Loaded"):Fire()
+LoadingScreen.Enabled = false
+
