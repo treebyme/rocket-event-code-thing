@@ -1,0 +1,19 @@
+local module = {}
+local TweenService = game:GetService("TweenService")
+
+function module.SetEqualizer(player, effect, high, low, mid)
+	
+	local properties = {}
+	properties["HighGain"] = high
+	properties["LowGain"] = low
+	properties["MidGain"] = mid
+	
+	local tw = TweenService:Create(
+		effect,
+		TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+		properties
+	)
+	tw:Play()
+end
+
+return module
