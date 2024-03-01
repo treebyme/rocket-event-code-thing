@@ -1,0 +1,27 @@
+local module = {}
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer.PlayerGui
+local BlackScreen = PlayerGui:WaitForChild("BlackScreen")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Modules = ReplicatedStorage:WaitForChild("Modules")
+local Effects = Modules:WaitForChild("Effects")
+local SoundEffectsModule = require(Effects:WaitForChild("SoundEffects"))
+
+local SoundService = game:GetService("SoundService")
+local BackgroundMusic = SoundService:WaitForChild("BackgroundMusic")
+local EQ = BackgroundMusic:WaitForChild("EqualizerSoundEffect")
+
+function module.BlackScreenAppear(text: string, duration: number)
+	BlackScreen.TextLabel.Text = text
+	BlackScreen.Enabled = true
+	EQ.Enabled = true
+	task.wait(duration)
+	BlackScreen.Enabled = false
+	EQ.Enabled = false
+end
+
+
+return module
