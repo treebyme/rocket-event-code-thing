@@ -1,0 +1,196 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Events = ReplicatedStorage:WaitForChild("Events")
+local Loaded = Events:WaitForChild("Loaded")
+
+local Modules = ReplicatedStorage:WaitForChild("Modules")
+local ModuleEffects = Modules:WaitForChild("Effects")
+local SoundEffectsModule = require(ModuleEffects:WaitForChild("SoundEffects"))
+local UIEffectsModule = require(ModuleEffects:WaitForChild("UIEffects"))
+local LightingEffectsModule = require(ModuleEffects:WaitForChild("LightingEffects"))
+
+local ModuleIntro = Modules:WaitForChild("Intro")
+local IntroParticles = require(ModuleIntro:WaitForChild("IntroParticles"))
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer.PlayerGui
+
+local Menu = PlayerGui:WaitForChild("Menu")
+local MenuFrame = Menu:WaitForChild("Frame")
+local Instruction = MenuFrame:WaitForChild("Instruction")
+local Title = MenuFrame:WaitForChild("Title")
+local Countdown = PlayerGui:WaitForChild("Countdown")
+local ctext = Countdown:WaitForChild("TextLabel")
+
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
+
+local BackgroundMusic = SoundService:WaitForChild("BackgroundMusic")
+local SoundEffects = SoundService:WaitForChild("SoundEffects")
+
+local IntroWorkspace = workspace:WaitForChild("Intro")
+local Lights = IntroWorkspace:WaitForChild("Lights")
+local CameraPart = IntroWorkspace:WaitForChild("CameraPart")
+local CameraPositions = IntroWorkspace:WaitForChild("CameraPositions")
+local Rocket = IntroWorkspace:WaitForChild("Rocket")
+
+local function Blinking()
+	while task.wait(0.5) do
+		Instruction.Visible = not Instruction.Visible
+	end
+end
+
+local newthread = coroutine.create(Blinking)
+
+Loaded.Event:Wait()
+
+workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
+workspace.CurrentCamera.FieldOfView = 15
+local connection = RunService.RenderStepped:Connect(function()
+	workspace.CurrentCamera.CFrame = CameraPart.CFrame
+end)
+
+Menu.Enabled = true
+coroutine.resume(newthread)
+UserInputService.InputEnded:Wait()
+coroutine.close(newthread)
+TweenService:Create(Title,
+	TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.In),
+	{["TextTransparency"] = 1}
+):Play()
+for i = 1, 9 do
+	task.wait(0.05)
+	Instruction.Visible = not Instruction.Visible
+end
+Instruction.Visible = false
+
+BackgroundMusic:WaitForChild("Menu"):Play()
+
+Lights:WaitForChild("Cameramiddle").SpotLight.Brightness = 0
+Lights:WaitForChild("Cameramiddle").SpotLight.Angle = 0
+
+local function EnableLights(light: Light, brightness: number, angle: number)
+	local properties = {}
+	properties["Brightness"] = brightness
+	properties["Angle"] = angle
+	
+	local tlight = TweenService:Create(light, TweenInfo.new(1.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.In), properties)
+	tlight:Play()
+end
+
+local t1: Tween
+local function Scene1()
+	Lights:WaitForChild("Right").SpotLight.Brightness = 0
+	Lights:WaitForChild("Right").SpotLight.Angle = 0
+
+	CameraPart.CFrame = CameraPositions:WaitForChild("RightDownCameraPosition").CFrame
+	t1 = TweenService:Create(CameraPart,
+		TweenInfo.new(10.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In),
+		{["CFrame"] = CameraPositions:WaitForChild("RightUpCameraPosition").CFrame}
+	)
+	t1:Play()
+	
+	TweenService:Create(MenuFrame,
+		TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.In),
+		{["BackgroundTransparency"] = 1}
+	):Play()
+	
+	task.wait(4)
+	EnableLights(Lights:WaitForChild("Right").SpotLight, 1.4, 108)
+	task.wait(0.5)
+	SoundEffects:WaitForChild("Light1"):Play()
+end
+
+local t2: Tween
+local function Scene2()
+	Lights:WaitForChild("Left").SpotLight.Brightness = 0
+	Lights:WaitForChild("Left").SpotLight.Angle = 0
+	CameraPart.CFrame = CameraPositions:WaitForChild("LeftDownCameraPosition").CFrame
+	t2 = TweenService:Create(CameraPart,
+		TweenInfo.new(10.5, Enum.EasingStyle.Sine, Enum.EasingDirection.Out),
+		{["CFrame"] = CameraPositions:WaitForChild("LeftUpCameraPosition").CFrame}
+	)
+	t2:Play()
+	task.wait(1)
+	EnableLights(Lights:WaitForChild("Left").SpotLight, 1.4, 108)
+	task.wait(0.5)
+	SoundEffects:WaitForChild("Light2"):Play()
+end
+
+local t3: Tween
+local function Scene3()
+	workspace.CurrentCamera.FieldOfView = 30
+	CameraPart.CFrame = CameraPositions:WaitForChild("MiddleDownCameraPosition").CFrame
+	t3 = TweenService:Create(CameraPart,
+		TweenInfo.new(12, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+		{["CFrame"] = CameraPositions:WaitForChild("MiddleUpCameraPosition").CFrame}
+	)
+	t3:Play()
+	task.wait(6)
+	EnableLights(Lights:WaitForChild("Cameramiddle").SpotLight, 0.4, 90)
+	task.wait(0.6)
+	SoundEffects:WaitForChild("Light3"):Play()
+	task.wait(0.35)
+	workspace.CurrentCamera.FieldOfView = 35
+end
+
+Scene1()
+t1.Completed:Wait()
+Scene2()
+t2.Completed:Wait()
+Scene3()
+t3.Completed:Wait()
+
+--SoundEffectsModule:SetEqualizer(BackgroundMusic:WaitForChild("Menu"):WaitForChild("EqualizerSoundEffect"), -80, 5.5, -51.2)
+task.wait(1)
+UIEffectsModule.BlackScreenAppear("it's time...", 2)
+task.wait(3)
+UIEffectsModule.BlackScreenAppear("for the moment...", 2)
+task.wait(3)
+UIEffectsModule.BlackScreenAppear("we were waiting for...", 2)
+task.wait(3)
+BackgroundMusic:WaitForChild("EqualizerSoundEffect").Enabled = true
+
+local ctproperties = {}
+ctproperties["TextTransparency"] = 1
+ctproperties["TextSize"] = 100
+
+SoundEffects:WaitForChild("Countdown"):Play()
+Countdown.Enabled = true
+
+for i = 10, 0, -1 do
+	ctext.TextTransparency = 0
+	ctext.TextSize = 80
+	ctext.Text = i
+
+	local ctt = TweenService:Create(ctext, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), ctproperties)
+	ctt:Play()
+	if i ~= 0 then
+		task.wait(1)
+	end
+end
+print("yeahhhhh")
+IntroParticles.ParticleSmoke(true)
+IntroParticles.ParticleFire(true)
+
+Rocket:WaitForChild("BoosterSounds").LaunchSound:Play()
+Rocket.BoosterSounds.Engines:Play()
+
+local timepassed = 0
+
+while true do
+	wait(0.5)
+	Rocket.MAIN.BodyVelocity.Velocity = Rocket.MAIN.BodyVelocity.Velocity + Vector3.new(0,6,0)
+	timepassed = timepassed + 0.5
+	if timepassed > 12 then
+		Rocket.BoosterSounds.Explosion2:Play()
+		break
+	end
+end
+
+task.wait(2)
+
+UIEffectsModule.BlackScreenAppear("we forgot to fuel it", 4)
