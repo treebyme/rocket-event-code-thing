@@ -1,0 +1,32 @@
+local module = {}
+
+local IntroFolder = workspace:WaitForChild("Intro")
+local StillParticles = IntroFolder:WaitForChild("StillParticles")
+local Particles = IntroFolder:WaitForChild("Rocket"):WaitForChild("Particles")
+
+function module.ParticleFire(enable: boolean)
+	for i, v in pairs(Particles:GetDescendants()) do
+		if v:IsA("ParticleEmitter") then
+			if enable then
+				v.Enabled = true
+			else
+				v.Enabled = false
+			end
+		end
+	end
+end
+
+function module.ParticleSmoke(enable: boolean)
+	for i, v in pairs(StillParticles:GetDescendants()) do
+		if v:IsA("ParticleEmitter") then
+			if enable then
+				v.Enabled = true
+			else
+				v.Enabled = false
+			end
+		end
+	end
+end
+
+
+return module
